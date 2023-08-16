@@ -1,0 +1,10 @@
+couchdb/.delete
+couchdb/shards
+couchdb/_dbs.couch
+couchdb/_nodes.couch
+logs/
+notes.txt
+*.key
+*.crt
+*.env
+*.pem

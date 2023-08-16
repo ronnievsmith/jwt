@@ -1,0 +1,17 @@
+services:
+  nodejs:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM node:slim
+        WORKDIR /usr/src/app/
+        COPY ./nodejs ./
+        RUN npm install && npm cache clean --force
+    container_name: nodejs
+    restart: unless-stopped
+    command: >
+      sh -c "npm start"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nodejs/keys:/usr/src/app/keys
