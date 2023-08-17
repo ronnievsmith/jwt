@@ -56,7 +56,7 @@ const SERVER = http.createServer(async function(request, response) {
 
 (async function () {
     try {
-      keys = await authentication.getKeys();  //before we start server we need RSA keys
+      await authentication.getKeys();  //before we start server we need RSA keys
       await SERVER.listen(PORT);
       console.log('\x1b[32m%s\x1b[0m',`Server running at http://127.0.0.1:${PORT}/`);
     } catch(e) {
@@ -84,8 +84,14 @@ async function user (request){
       let cookies = parseCookies(request.headers.cookie);
       if(cookies.token){
         let token = cookies.token;
-        //let jot = jwt.verify(jwtPublicKey,token);
-        let jot = await jwt.decryptMessage(token);
+        let tokenParts = token.split('.');
+        let jot = undefined;
+        console.log("jwt parts array length is " + tokenParts.length)
+        if(tokenParts.length > 3){
+          jot = await jwt.decryptMessage(token);
+        } else {
+          jot = jwt.verify(token);
+        }
         user = Object.assign(user,jot)   
       }     
     } catch (e) {

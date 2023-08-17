@@ -1,4 +1,4 @@
-const {generateKey,createSign,createVerify,KeyObject,randomBytes,scrypt,randomFill, createCipheriv, createDecipheriv} = await import('node:crypto');
+const {generateKey,createSign,createVerify,KeyObject,randomBytes,scrypt,randomFill, createCipheriv, createDecipheriv,createSecretKey} = await import('node:crypto');
 const { subtle } = globalThis.crypto;
 import { Buffer } from 'node:buffer';
 const headerObject = {
@@ -8,44 +8,6 @@ const headerObject = {
 };
 const headerString = JSON.stringify(headerObject);
 const encodedHeader = Buffer.from(headerString).toString('base64url');
-
-// JWE ====================================================================
-
-function returnEncodedJWEProtectedHeader(){
-  let headerObject = {"alg":"dir","enc":"A256GCM"}; //An empty octet sequence is used as the JWE Encrypted Key value.
-  let headerString = JSON.stringify(headerObject);
-  let encodedJWEProtectedHeader = Buffer.from(headerString).toString('base64url');
-  return encodedJWEProtectedHeader
-}
-async function issueJWE(contentEncryptionCryptoKey, claimsObject){
-  let encodedJWEProtectedHeader = returnEncodedJWEProtectedHeader()
-  //encodedJWEProtectedHeader = Buffer.from(encodedJWEProtectedHeader);
-  let claimsString = JSON.stringify(claimsObject);
-  let claimsBase64URLEncoded = Buffer.from(claimsString).toString('base64url');
-  //let claimsBuffer = Buffer.from(claimsBase64URLEncoded);
-  let encryptionObject = await returnEncryptedObject(contentEncryptionCryptoKey, encodedJWEProtectedHeader, claimsBase64URLEncoded);
-  let iv = Buffer.from(encryptionObject.iv).toString('base64url');
-  let cipherText = Buffer.from(encryptionObject.cipherText).toString('base64url');
-  let authTag = Buffer.from(encryptionObject.authTag).toString('base64url');
-  let encryptedKey = "";
-  return encodedJWEProtectedHeader + "." + encryptedKey + "." + iv + "." + cipherText + "." + authTag;
-}
-
-function keyGen () {
-  return new Promise(function(resolve, reject) {
-    // crypto.createSecretKey(key[, encoding]) or
-    generateKey('aes', { length: 256 }, (err, key) => {
-      if (err) {
-        reject (err);
-      }
-      //console.dir(key)
-      //let jwk = key.export({format:'jwk'});
-      ///jwk = JSON.stringify(jwk);
-      //resolve (jwk);
-      resolve (key)
-    });
-  });
-}
 
 function ivGen () {
   return new Promise(function(resolve, reject) {
@@ -60,15 +22,16 @@ function ivGen () {
   });
 }
 
-const key = await keyGen();
-const iv = await ivGen();
-
 async function setJWE(claimsObject){
   let headerObject = {"alg":"dir","enc":"A256GCM"}; 
   let headerString = JSON.stringify(headerObject);
-
+  let iv = await ivGen();
+  let key = Buffer.from(process.env.jwkKey,'base64url');
   let claimsString = JSON.stringify(claimsObject);
   let claimsBase64URLEncoded = Buffer.from(claimsString).toString('base64url');
+
+  //console.dir(key)
+  //console.log("key size is " + key.symmetricKeySize + " and type is " + key.type)
   let cipher = createCipheriv('aes-256-gcm', key, iv);
   cipher.setAAD(Buffer.from(headerString));
   cipher.setAutoPadding();
@@ -82,30 +45,6 @@ async function setJWE(claimsObject){
   return result;
 }
 
-// async function returnEncryptedObject(contentEncryptionCryptoKey, encodedJWEProtectedHeader, claimsBase64URLEncoded) {
-//   let obj = {};
-//   let tagLength = 128;
-//   //let iv = randomBytes(12);
-//   //let iv = crypto.getRandomValues(new Uint8Array(12));
-//   let iv = crypto.getRandomValues(new Uint8Array(24));
-//   let additionalData = Buffer.from(encodedJWEProtectedHeader, 'base64url');
-//   let cipherText = await crypto.subtle.encrypt(
-//     {
-//       name: "AES-GCM",
-//       iv: iv,
-//       additionalData: encodedJWEProtectedHeader//, //buffer from ASCII(BASE64URL(UTF8(JWE Protected Header)))
-//     },
-//     contentEncryptionCryptoKey,
-//     claimsBase64URLEncoded
-//   );
-//   let authTagBytesLength = tagLength / 8;
-//   let authTagBytes = cipherText.slice(cipherText.byteLength - authTagBytesLength,cipherText.byteLength);
-//   obj.iv = new TextDecoder().decode(iv);
-//   obj.cipherText = new TextDecoder().decode(cipherText);
-//   obj.authTag = new TextDecoder().decode(authTagBytes);
-//   return obj;
-// }
-
 async function decryptMessage(jwe) {
   let parts = jwe.split(".");
   let encodedJWEProtectedHeader = parts[0];
@@ -113,7 +52,9 @@ async function decryptMessage(jwe) {
   let cipherText = parts[3];
   let tag = parts[4];
   let tagBuffer = Buffer.from(tag,'base64url');
-
+  console.log(process.env.jwkKey)
+  let key = Buffer.from(process.env.jwkKey,'base64url');
+  let iv = Buffer.from(parts[2],'base64url');
   try {
     const decipher = createDecipheriv('aes-256-gcm', key, iv);
     decipher.setAAD(protectedHeaderBuffer);
@@ -124,21 +65,20 @@ async function decryptMessage(jwe) {
   } catch (e) {
     console.dir(e); 
   }
-
 }
 
-function issue(privateKey,claims){
+function issue(claims){
   let payloadString = JSON.stringify(claims);
   let encodedPayload = Buffer.from(payloadString).toString('base64url');
   const sign = createSign('SHA256');
   sign.write(encodedHeader + '.' + encodedPayload);
   sign.end();
-  let signature = sign.sign(privateKey, 'base64url');
+  let signature = sign.sign(process.env.jwsPrivateKey, 'base64url');
   let jsonWebToken = encodedHeader + '.' + encodedPayload + '.' + signature;
   return jsonWebToken;
 }
 
-function verify(publicKey,jwt){
+function verify(jwt){
   let jwtParts = jwt.split('.');
   let jwtHeader = jwtParts[0];
   let jwtPayload = jwtParts[1];
@@ -151,7 +91,7 @@ function verify(publicKey,jwt){
       const verify = createVerify('SHA256');
       verify.write(jwtHeader + '.' + jwtPayload);
       verify.end();
-      obj.valid = verify.verify(publicKey, jwtSignature, 'base64url');
+      obj.valid = verify.verify(process.env.jwsPublicKey, jwtSignature, 'base64url');
       obj.payload = {};
       try {
         jwtPayload = JSON.parse(Buffer.from(jwtPayload, 'base64url').toString('utf-8'));
@@ -166,4 +106,4 @@ function verify(publicKey,jwt){
   }
 }
 
-export default {issue, issueJWE, verify, decryptMessage, setJWE};
+export default {issue, verify, decryptMessage, setJWE};
