@@ -1,7 +1,7 @@
 //import db from './db.mjs';
 import fs from "node:fs";
 import jwt from './jwt.mjs';
-const {generateKeyPairSync,randomUUID,generateKey,randomFill} = await import('node:crypto');
+const {generateKeyPairSync,randomUUID,generateKey,randomFill,KeyObject,createSecretKey} = await import('node:crypto');
 //import sgMail from '@sendgrid/mail';
 import url from 'node:url';
 import path from "node:path";
@@ -97,10 +97,19 @@ async function getKeys() {
   	let jwkString = fs.readFileSync(JWE_JWK_PATH, 'utf8');
   	let jwkObject = JSON.parse(jwkString);
 	  process.env.jwkKey = jwkObject.k;
-  } catch {
-
+	  process.env.jwkString = jwkString;
+	  //process.env.keyObject = KeyObject.from(jwkString)
+	  //createSecretKey(key[, encoding])
+	  //let keyObject = createSecretKey(jwkString,'base64url');
+	  //process.env.keyObject = keyObject
+	  //console.log("type is: " + keyObject.symmetricKeySize)
+	  return
+  } catch (e){
+  	console.log("getKey catch fired" + e)
   	let keyObject = await keyGen();
+  	
   	let jwk = keyObject.export({format:'jwk'})
+  	process.env.jwkString = JSON.stringify(jwk);
 		process.env.jwkKey = jwk.k;
 
 	  if (!fs.existsSync(JWE_KEY_PATH)){
