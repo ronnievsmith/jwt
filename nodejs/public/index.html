@@ -110,7 +110,8 @@
       display: flex;
       justify-content: center;
     }
-    body > footer > section {
+    body > footer > p {
+      text-align: center;
       margin: 1em;
       color: #9e9e9e;
     }
@@ -149,13 +150,13 @@
   </aside>
   <main>
   	<h1>
-  		JSON Web Token (JWT) Generator
+  		JSON Web Token (JWT) Client - The Web Browser
   	</h1>
   	<p>
-  		Click the GET TOKEN button below to have the Node.js server generate a JSON Web Token, JWT. The JWT will be returned as an HTTP cookie. This example implementation is using JWT's as access tokens. Note that the use case for JWKs is not limited to access tokens, and, it is possible to implement JWKs as access tokens that bahave different from this implementation. This implementation is a sensible use case using sensible schemes.
+  		Click the GET TOKEN button below to have the Node.js server generate a JSON Web Token, JWT. The JWT will be returned as an HTTP cookie. This implementation illustrates using JWT's as access tokens. Note that the use case for JWTs is not limited to access tokens, and, it is possible to implement JWTs as access tokens that bahave different from this implementation. This implementation is a sensible use case using sensible schemes.
   	</p>
     <p>
-      Node's crypt module was used in this implementation, namely, the <code>createCipheriv, createDecipheriv, createSign, createVerify, createPrivateKey, createPublicKey, createSecretKey, randomFill, generateKey, generateKeyPairSync,</code> and <code>randomUUID</code> methods. For more information on the JWT algorithm see the RFC's <a href="https://datatracker.ietf.org/doc/html/rfc7516">JWE</a> and <a href="https://datatracker.ietf.org/doc/html/rfc7515">JWS</a>.
+      Node's <a href="https://nodejs.org/api/crypto.html">crypt module</a> was used in this implementation, namely, the <code>createCipheriv, createDecipheriv, createSign, createVerify, createPrivateKey, createPublicKey, createSecretKey, randomFill, generateKey, generateKeyPairSync,</code> and <code>randomUUID</code> methods. For more information on the JWT algorithm see the RFC's <a href="https://datatracker.ietf.org/doc/html/rfc7516">JWE</a> and <a href="https://datatracker.ietf.org/doc/html/rfc7515">JWS</a>.
     </p>
     <h2>Different Behaviors</h2>
     <p>
@@ -164,9 +165,14 @@
     <p>
       JSON Web Signature (JWS) token payload is readable by the browser and the <code>Sign In</code> button top right toggles to show the subscriber email address. Asymmetric 2048 bit RSA keys are used in this scheme. The private key encrypts and the public key decrypts. Notice that the JWS is readable by anyone however only the server can validate the token signature. Manipulation of any part of the JWS results in the JWT being invalidated by the server.
     </p>
-    <h2>Watch Site Cookies</h2>
+    <h2>How Does This Work?</h2>
+    <h3>In The Browser</h3>
     <p>
-      Open Developer Tools in your web browser by pressing <code>Control + Shift + i</code>. Click <code>Application</code> then click <code>Cookies</code>. Notice when you click <code>Get Token</code> and <code>Logout</code> how the <code>token</code> cookie appears and disappears. The value of this cookie is the JSON Web Token (JWT).
+      <b>Open Developer Tools in your web browser by pressing <code>Control + Shift + i</code>. Click <code>Application</code> then click <code>Cookies</code>. Notice when you click <code>Get Token</code> and <code>Logout</code> how the <code>token</code> cookie appears and disappears. The value of this cookie is the JSON Web Token (JWT).</b>
+    </p>
+    <h3>On The Node Server</h3>
+    <p>
+      <b>Open the <code>server.mjs</code> and <code>jwt.mjs</code> modules and inspect the easy to read code.</b>
     </p>
     <fieldset>
         <legend>JSON Web Token:</legend>
@@ -186,11 +192,7 @@
   </main>
    <footer>
     <p>
-      Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-      The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-      THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+      Permission is hereby granted, free of charge. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     </p>
   </footer>
   <script>
