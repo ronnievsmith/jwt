@@ -17,6 +17,7 @@ const {
 } = await import('node:crypto');
 const DIR_NAME = path.dirname(url.fileURLToPath(import.meta.url));
 const APP_PATH = path.join(DIR_NAME, '.');
+const KEY_PATH = path.join(APP_PATH, 'keys');
 const JWS_KEY_PATH = path.join(APP_PATH, 'keys', 'jws');
 const JWE_KEY_PATH = path.join(APP_PATH, 'keys', 'jwe');
 const JWS_PRIVATE_KEY_PATH = path.join(JWS_KEY_PATH, 'private.pem');
@@ -99,6 +100,9 @@ async function loadKeys() {
         format: 'pem',
       }
     });
+    if(!fs.existsSync(KEY_PATH)){
+      fs.mkdirSync(KEY_PATH);
+    }
     if (!fs.existsSync(JWS_KEY_PATH)){
       fs.mkdirSync(JWS_KEY_PATH);
     }
@@ -117,6 +121,9 @@ async function loadKeys() {
   } catch (e) {
     JWE_JWK = await generateSecretKey();
     let jwk = JWE_JWK.export({format:'jwk'});
+    if(!fs.existsSync(KEY_PATH)){
+      fs.mkdirSync(KEY_PATH);
+    }
     if (!fs.existsSync(JWE_KEY_PATH)){
       fs.mkdirSync(JWE_KEY_PATH);
     }
