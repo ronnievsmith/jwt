@@ -12,7 +12,7 @@ Asymmetric 2048 bit RSA keys are used in this scheme - the private key creates t
 
 ## Implementation Specifics JWE
 
-In this implementation, a 256 bit Galois/Counter Mode AES Content Encryption Key (CEK) is used in direct encryption scheme. The same secret key is used to both encrypt and decrypt tokens.
+In this implementation, a 256 bit Galois/Counter Mode AES encryption key is used in direct encryption scheme. The same secret key is used to both encrypt and decrypt tokens.
 
 ### License
 
