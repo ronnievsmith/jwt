@@ -16,8 +16,7 @@ const {
   randomUUID,
 } = await import('node:crypto');
 const DIR_NAME = path.dirname(url.fileURLToPath(import.meta.url));
-const APP_PATH = path.join(DIR_NAME, '..');
-const ROOT_PATH = path.join(DIR_NAME, '...');
+const APP_PATH = path.join(DIR_NAME, '.');
 const JWS_KEY_PATH = path.join(APP_PATH, 'keys', 'jws');
 const JWE_KEY_PATH = path.join(APP_PATH, 'keys', 'jwe');
 const JWS_PRIVATE_KEY_PATH = path.join(JWS_KEY_PATH, 'private.pem');

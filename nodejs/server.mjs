@@ -8,21 +8,16 @@ import path from "node:path";
 import url from 'node:url';
 import 'dotenv/config';
 const DIR_NAME = path.dirname(url.fileURLToPath(import.meta.url));
-import jwt from './cbn-modules/jwt.mjs';
-//import authentication from './cbn-modules/authentication.mjs';
+import jwt from './jwt.mjs';
 const PORT = process.env.NODEJS_PORT || 8080;
 const ROOT_DIRECTORY = './public';
 const ROOT_PATH = path.join(DIR_NAME, ROOT_DIRECTORY);
-var keys = undefined;
-
-// const { privateKey, publicKey } = authentication.loadKeys("jwt");  //before we start server we need RSA keys
-
 const SERVER = http.createServer(async function(request, response) {
 
   let sub = await user(request);
   console.dir(sub);
 
-  if (request.url.startsWith('/auth')){ // ================================================
+  if (request.url.startsWith('/auth')){
     let type = request.url.split("?")[1];
     await jwt.issue(request,response,type);
     return response.end();
@@ -37,7 +32,7 @@ const SERVER = http.createServer(async function(request, response) {
       response.setHeader('Set-Cookie', cookieArray);
       return response.end();
     }
-  } else { // =====================================================================================
+  } else {
     let indexPath = path.join(ROOT_PATH,'index.html');
     let stat = fs.statSync(indexPath);
     response.writeHead(200, {

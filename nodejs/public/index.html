@@ -2,7 +2,7 @@
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
   <meta charset="utf-8">
-  <title>JWT Generator</title>
+  <title>JWT Generator by Ronnie Royston</title>
   <link rel="icon" href="data:,">
   <style>
     html{
@@ -20,7 +20,7 @@
       min-height: 100vh;
       min-width: 0;
     }
-    body > aside{
+    body > aside {
       overflow: hidden;
       min-width: 0;
       outline: 1px dashed #d50000;
@@ -32,6 +32,7 @@
     }
     body > aside > section {
       margin: 0px 12px 0px 12px;
+      word-wrap: break-word;
     }
     body > header {
       display: flex;
@@ -147,32 +148,33 @@
   <nav>
   </nav>
   <aside>
+    <h3>Token</h3>
+    <section></section>
   </aside>
   <main>
   	<h1>
-  		JSON Web Token (JWT) Client - The Web Browser
+  		JSON Web Tokens (JWTs) with Node.js
   	</h1>
-  	<p>
-  		Click the GET TOKEN button below to have the Node.js server generate a JSON Web Token, JWT. The JWT will be returned as an HTTP cookie. This implementation illustrates using JWT's as access tokens. Note that the use case for JWTs is not limited to access tokens, and, it is possible to implement JWTs as access tokens that bahave different from this implementation. This implementation is a sensible use case using sensible schemes.
-  	</p>
     <p>
-      Node's <a href="https://nodejs.org/api/crypto.html">crypt module</a> was used in this implementation, namely, the <code>createCipheriv, createDecipheriv, createSign, createVerify, createPrivateKey, createPublicKey, createSecretKey, randomFill, generateKey, generateKeyPairSync,</code> and <code>randomUUID</code> methods. For more information on the JWT algorithm see the RFC's <a href="https://datatracker.ietf.org/doc/html/rfc7516">JWE</a> and <a href="https://datatracker.ietf.org/doc/html/rfc7515">JWS</a>.
+      JWTs represent claims between parties, e.g. "My name is Bob." JWTs come in two flavors, JSON Web Signatures (JWS) and JSON Web Encryption (JWE). The former secures unencrypted claims against tampering via digital signatures and the latter secures claims via encryption.
     </p>
-    <h2>Different Behaviors</h2>
+    <h2>Review The Node Server Code</h2>
     <p>
-      In this implementation of JSON Web Encryption (JWE) the token payload is not readable by the browser. Only the server can decrypt the JWE. This is why the <code>Sign In</code> button top right does not toggle to show the subscriber email address. A 256 bit Galois/Counter Mode AES Content Encryption Key (CEK) is used in direct encryption scheme meaning the same secret key is used to both encrypt and decrypt.
+      The JWTs come from the Node.js server and users are encouraged to review the Node.js source code. A key point is that JWTs enable user state (session) to be maintained client side. The server does not need to keep a state or session table. <b>Open the <code>server.mjs</code> and <code>jwt.mjs</code> modules and inspect the code.</b> Notice how the <code>sub</code> or subscriber logs as <code>null</code> unless the HTTP call includes a cookie containing a valid JWT.
     </p>
     <p>
-      JSON Web Signature (JWS) token payload is readable by the browser and the <code>Sign In</code> button top right toggles to show the subscriber email address. Asymmetric 2048 bit RSA keys are used in this scheme. The private key encrypts and the public key decrypts. Notice that the JWS is readable by anyone however only the server can validate the token signature. Manipulation of any part of the JWS results in the JWT being invalidated by the server.
+      Node's <a href="https://nodejs.org/api/crypto.html">crypt module</a> is used in this implementation, namely, the <code>createCipheriv, createDecipheriv, createSign, createVerify, createPrivateKey, createPublicKey, createSecretKey, randomFill, generateKey, generateKeyPairSync,</code> and <code>randomUUID</code> methods. For more information on the JWT algorithm see the respective RFC's for <a href="https://datatracker.ietf.org/doc/html/rfc7516">JWE</a> and <a href="https://datatracker.ietf.org/doc/html/rfc7515">JWS</a>.
     </p>
-    <h2>How Does This Work?</h2>
-    <h3>In The Browser</h3>
+    <h2>What Is This Webpage For?</h2>
     <p>
-      <b>Open Developer Tools in your web browser by pressing <code>Control + Shift + i</code>. Click <code>Application</code> then click <code>Cookies</code>. Notice when you click <code>Get Token</code> and <code>Logout</code> how the <code>token</code> cookie appears and disappears. The value of this cookie is the JSON Web Token (JWT).</b>
+      This page illustrates JWT's used as access tokens for server calls. Open Developer Tools in your web browser by pressing <code>Control + Shift + i</code>. Click <code>Application</code> then click <code>Cookies</code>. Notice when you click <code>Get Token</code> and <code>Logout</code> how the <code>token</code> cookie appears and disappears. The value of this cookie is the JSON Web Token (JWT).
+    </p>    
+    <h3>Different Behaviors</h3>
+    <p>
+      JWS token claims are readable by the browser. Asymmetric 2048 bit RSA keys are used in this scheme -the private key creates the digital signature and the public key verifies the signature.
     </p>
-    <h3>On The Node Server</h3>
     <p>
-      <b>Open the <code>server.mjs</code> and <code>jwt.mjs</code> modules and inspect the easy to read code.</b>
+      In this implementation, JWE claims are not readable by the browser. Only the server has the secret key to decrypt the JWE. This is why the fake <code>Sign In</code> button top right does not toggle to show the subscriber email address claim. A 256 bit Galois/Counter Mode AES Content Encryption Key (CEK) is used in direct encryption scheme. The same secret key is used to both encrypt and decrypt tokens.
     </p>
     <fieldset>
         <legend>JSON Web Token:</legend>
@@ -192,11 +194,11 @@
   </main>
    <footer>
     <p>
-      Permission is hereby granted, free of charge. THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+      THE FREE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     </p>
   </footer>
   <script>
-    var cbn = (function() {
+    var ronnieroyston = (function() {
       const cookies = getCookies();
       const localhost = new URL("http://127.0.0.1:8080/auth");
       let pub = {};
@@ -224,7 +226,6 @@
         }
       })
 
-
       async function afterAuth() {
         if (pub.user) {
           document.querySelector("#account").textContent = pub.user.email;
@@ -247,9 +248,33 @@
         return cookie;
       }
 
+      function displayToken(token){
+        document.querySelector("body > aside > section").innerHTML = "";
+        if (token){
+          let fragment = new DocumentFragment();
+          //let tokenParts = token.split(/[\.]/g);
+          let tokenParts = token.split(/(\.)/);
+          let colors = ["red","green","orange","blue","brown"];
+          tokenParts.forEach(function(part,index){
+            let span = document.createElement("span");
+            let textEl = document.createTextNode(part);
+            span.appendChild(textEl);
+            if(part != "."){
+              span.style.color = colors.shift();
+            }
+            //span.style.color = colors[index];
+            fragment.append(span);
+          })
+          document.querySelector("body > aside > section").appendChild(fragment);
+        } else {
+          document.querySelector("body > aside > section").innerHTML = "";
+        }
+      }
+
       async function readAuth() {
         try {
           pub.user = parseJws(getCookies().token)
+          displayToken(getCookies().token)
         } finally {
           afterAuth();
         }
